@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Search</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Voter Search</h1>
+        <form id="search-form">
+            <label for="voter_id">Enter Voter ID:</label>
+            <input type="text" id="voter_id" name="voter_id" required>
+            <button type="submit">Search</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <!-- Modal Popup -->
+    <div id="voter-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Voter Details</h2>
+            <p><strong>Name:</strong> <span id="voter-name"></span></p>
+            <p><strong>Voter ID:</strong> <span id="voter-voter-id"></span></p>
+            <p><strong>State:</strong> <span id="voter-state"></span></p>
+            <p><strong>District:</strong> <span id="voter-district"></span></p>
+            <p><strong>Constitution:</strong> <span id="voter-constitution"></span></p>
+            <p><strong>Gender:</strong> <span id="voter-gender"></span></p>
+            <img id="voter-photo" src="" alt="Voter Photo">
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+    $("#search-form").on("submit", function (e) {
+        e.preventDefault();
+        const voterId = $("#voter_id").val();
+
+        // AJAX request to fetch voter data
+        $.ajax({
+            url: "/",
+            method: "POST",
+            data: { voter_id: voterId },
+            success: function (response) {
+                // Populate modal with voter data
+                $("#voter-name").text(response.name);
+                $("#voter-voter-id").text(response.voter_id);
+                $("#voter-state").text(response.state);
+                $("#voter-district").text(response.district);
+                $("#voter-constitution").text(response.constitution);
+                $("#voter-gender").text(response.gender);
+
+                // Load image
+                if (response.photo) {
+                    const photoUrl = `/image/${response.photo_file_id}`;
+                    $("#voter-photo").attr("src", photoUrl);
+                } else {
+                    $("#voter-photo").attr("src", "");
+                }
+
+                // Show modal
+                $("#voter-modal").show();
+            },
+            error: function () {
+                alert("Voter not found!");
+            },
+        });
+    });
+
+    // Close modal
+    $(".close-button").on("click", function () {
+        $("#voter-modal").hide();
+    });
+});
+
+fetch('/search_page', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'  // Ensuring the server knows the data is JSON
+    },
+    body: JSON.stringify({
+        voter_id: 'some_voter_id'
+    })
+})
+.then(response => response.json())
+.then(data => {
+    console.log('Voter data:', data);
+})
+.catch(error => {
+    console.log('Error:', error);
+});
+
+</script>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+    text-align: center;
+    margin-top: 50px;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+input {
+    padding: 10px;
+    margin: 10px 0;
+    width: 300px;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#result {
+    margin-top: 20px;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content {
+    text-align: left;
+}
+
+.close-button {
+    float: right;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+</style>
+</html>
