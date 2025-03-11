@@ -52,7 +52,7 @@ def generate_otp():
 
 def send_verification_email(receiver_email, otp):
     try:
-        sender_email = "dipayansardar477@gmail.com"
+        sender_email = "dipayansard7@gmail.com"
         sender_password = "issq ubqn uipo zfrf"
         subject = "Email Verification"
         body = f"Your OTP for verification is: {otp}\nPlease enter this OTP to verify your email."
